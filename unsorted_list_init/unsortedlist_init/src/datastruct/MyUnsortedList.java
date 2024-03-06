@@ -1,171 +1,165 @@
 package datastruct;
 
-import static org.junit.Assert.*;
+import java.util.Arrays;
 
-import org.junit.Before;
-import org.junit.Test;
+public class MyUnsortedList<E> implements UnsortedList<E> {
 
-public class MyUnsortedListTest {
-	UnsortedList<Integer> list;
-	UnsortedList<Integer> emptylist;
-	UnsortedList<Integer> emptylist2;
-	@Before
-	public void init() {
-		list = MyUnsortedList.of(1,2,3,4);  
-		emptylist = MyUnsortedList.of();
-		emptylist2 = MyUnsortedList.of();
-	}
+    private static class Link<E> {
+        final E element;
+        Link<E> next;
 
-	@Test
-	public void testIsEmpty() {
-		assertTrue("list is empty", emptylist.isEmpty());
-	}
-	@Test
-	public void testIsNotEmpty() {
-		assertFalse("list is not empty", list.isEmpty());
-	}
-	@Test
-	public void testSize() {
-		assertEquals(4, list.size());
-	}
-	@Test
-	public void testPrepend() {
-		UnsortedList<Integer> prependlist = MyUnsortedList.of(0,1,2,3,4);  
-		list.prepend(0);
-		assertEquals(prependlist, list);
-	}
-	@Test
-	public void testAppend() {
-		UnsortedList<Integer> appendlist = MyUnsortedList.of(1,2,3,4,5);  
-		list.append(5);
-		assertEquals(appendlist, list);
-	}
-	@Test
-	public void testInsert() {
-		UnsortedList<Integer> insertlist = MyUnsortedList.of(1,2,3,8,4);  
-		list.insert(8,3);
-		System.out.print(list);
-		assertEquals(insertlist, list);
-	}
-	@Test
-	public void testInsertInEmptyList() {
-	     emptylist.insert(10, 0);
-	     assertEquals("List size should be 1 after insertion", 1, emptylist.size());
-	 }
-	@Test(expected = IndexOutOfBoundsException.class)
-	public void testInsertPosNeg() {	
-		list.insert(8,-1);
-	}
-	@Test(expected = IndexOutOfBoundsException.class)
-	public void testInsertPlsuGrandeQueSize() {
-		list.insert(8,10);
-	}
-	@Test 
-	public void testPop() {
-		UnsortedList<Integer> poplist = MyUnsortedList.of(2,3,4);  
-		list.pop();
-		assertEquals(poplist, list);
-		
-	}
-	@Test(expected = EmptyListException.class)
-	public void testPopEmpty() {
-		emptylist.pop();
-	}
-	@Test 
-	public void testReturnValeuOfPop() {
-		int popped = list.pop();
-		assertEquals(1, popped);
-	}
-	@Test
-	public void testPopLast() {
-		list.popLast();
-		assertEquals(3,list.size());
-	}
-	@Test(expected = EmptyListException.class)
-	public void testPopLastEmptyList() {
-		emptylist.popLast();
-	}
-	@Test
-	public void testPopLastReturn() {
-		int lastpopped = list.popLast();
-		assertEquals(4,lastpopped);
-	}
-	@Test
-	public void testRemove() {	
-		UnsortedList<Integer> removedlist = MyUnsortedList.of(1,3,4);  
-		list.remove(1);
-		System.out.print(list);
-		assertEquals(removedlist, list);
-	}
-	@Test
-	public void testRemovePosZero() {	
-		UnsortedList<Integer> poppedlist = MyUnsortedList.of(2,3,4);  
-		list.remove(0);
-		assertEquals(poppedlist, list);
-	}
-	@Test(expected = IndexOutOfBoundsException.class)
-	public void testRemoveEmptyList() {	
-		emptylist.remove(1);
-	}
-	@Test(expected = IndexOutOfBoundsException.class)
-	public void testRemovePosNeg() {	
-		list.remove(-1);
-	}
-	@Test(expected = IndexOutOfBoundsException.class)
-	public void testRemovePosPlsuGrandeQueSize() {
-		list.remove(10);
-	}
-	@Test
-    public void testEqualsSelf() {
-        assertTrue("A list should be equal to itself", list.equals(list));
+        private Link(E element) {
+            this.element = element;
+        }
     }
 
-    @Test
-    public void testNotEqualsNull() {
-        assertFalse("A list should not be equal to null", list.equals(null));
+    private Link<E> head;
+    private int size;
+
+    private MyUnsortedList() {
+        this.head = null;
+        this.size = 0;
     }
 
-    @Test
-    public void testNotEqualsDifferentType() {
-        assertFalse("A list should not be equal to an object of a different type", list.equals(new Object()));
+    @SafeVarargs
+    public static <E> MyUnsortedList<E> of(E... elements) {
+        return of(Arrays.asList(elements));
     }
 
-    @Test
-    public void testEqualsSameElements() {
-        UnsortedList<Integer> other = MyUnsortedList.of(1, 2, 3, 4);
-        assertTrue("Two lists with the same elements should be equal", list.equals(other));
+    public static <E> MyUnsortedList<E> of(Iterable<E> elements) {
+        MyUnsortedList<E> list = new MyUnsortedList<>();
+        for (E element : elements) {
+            list.append(element);
+        }
+        return list;
     }
 
-    @Test
-    public void testNotEqualsDifferentSize() {
-        UnsortedList<Integer> shorter = MyUnsortedList.of(1, 2, 3);
-        assertFalse("Two lists of different sizes should not be equal", list.equals(shorter));
+    @Override
+    public boolean isEmpty() {
+        return size == 0;
     }
 
-    @Test
-    public void testNotEqualsDifferentOrder() {
-        UnsortedList<Integer> differentOrder = MyUnsortedList.of(4, 3, 2, 1);
-        assertFalse("Two lists with the same elements in a different order should not be equal", list.equals(differentOrder));
+    @Override
+    public int size() {
+        return size;
     }
 
-    @Test
-    public void testNotEqualsDifferentElements() {
-        UnsortedList<Integer> differentElements = MyUnsortedList.of(5, 6, 7, 8);
-        assertFalse("Two lists with different elements should not be equal", list.equals(differentElements));
+    @Override
+    public void prepend(E element) {
+        size++;
+        Link<E> newHead = new Link<>(element);
+        newHead.next = head;
+        head = newHead;
     }
 
-    @Test
-    public void testEqualsEmptyLists() {
-        UnsortedList<Integer> anotherEmptyList = MyUnsortedList.of();
-        assertTrue("Two empty lists should be equal", emptylist.equals(emptylist2));
+    @Override
+    public void append(E element) {
+        insert(element, size);
     }
 
-	
+    @Override
+    public void insert(E elem, int pos) throws IndexOutOfBoundsException {
+        if (pos < 0 || pos > size) {
+            throw new IndexOutOfBoundsException();
+        }
+        if (pos == 0) {
+            prepend(elem);
+            return;
+        }
+
+        Link<E> prevLink = head;
+        while (pos-- > 1) {
+            prevLink = prevLink.next;
+        }
+
+        size++;
+        Link<E> inserted = new Link<>(elem);
+        Link<E> nextLink = prevLink.next;
+        prevLink.next = inserted;
+        inserted.next = nextLink;
+    }
+
+    @Override
+    public E pop() {
+        if (isEmpty()) {
+            throw new EmptyListException();
+        }
+
+        size--;
+        Link<E> oldHead = head;
+        head = oldHead.next;
+
+        return oldHead.element;
+    }
+
+    @Override
+    public E popLast() {
+    	  if (isEmpty()) {
+              throw new EmptyListException();
+          }
+        return remove(size - 1);
+    }
+
+    @Override
+    public E remove(int pos) throws IndexOutOfBoundsException {
+        if (pos < 0 || pos >= size) {
+            throw new IndexOutOfBoundsException();
+        }
+        if (pos == 0) {
+            return pop();
+        }
+        size--;
+        Link<E> prevLink = head;
+        while (--pos > 0) {
+            prevLink = prevLink.next;
+        }
+
+        Link<E> removed = prevLink.next;
+        prevLink.next = removed.next;
+
+        return removed.element;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof MyUnsortedList)) {
+            return false;
+        }
+
+        @SuppressWarnings("unchecked")
+        MyUnsortedList<E> that = (MyUnsortedList<E>) obj;
+        if (this.size != that.size) {
+            return false;
+        }
+
+        Link<E> thisLink = this.head;
+        Link<E> thatLink = that.head;
+        while (thisLink != null) {
+            if (thatLink == null || !thisLink.element.equals(thatLink.element)) {
+                return false;
+            }
+            thisLink = thisLink.next;
+            thatLink = thatLink.next;
+        }
+
+        return thatLink == null;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder("MyUnsortedList { size = ");
+        builder.append(size);
+        builder.append(", [");
+
+        MyUnsortedList.Link<E> link = head;
+        while (link != null) {
+            builder.append(link.element);
+            link = link.next;
+            if (link != null) {
+                builder.append(", ");
+            }
+        }
+
+        return builder.append("] }").toString();
+    }
 }
-
-
-
-
-
-
-
